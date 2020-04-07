@@ -1,0 +1,3 @@
+**Changes from initial presentation:**
+I overlooked the fact that this dataset actually provides data about which moves were used/which tactics were used, so I will use this data to furthur specify the types of match-ups that happen.
+I also should have checked the dataset earilier, I found out that there are not enough repeatedly appearing players to deduce any meaningful match data, so I found a new dataset that has a lot of games with alot of repeated players.
