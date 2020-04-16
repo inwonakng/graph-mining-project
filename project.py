@@ -4,6 +4,7 @@ import networkx as nx
 import chess.pgn as ch
 import datetime
 import pickle
+import random
 
 def read_data(file,limit):
     games = []
@@ -117,7 +118,7 @@ def common_neighbors(white,black,g,threshold):
     else: return 'SKIP'
     # These guys also return the calculated values since I may want to use it later for combining outcomes
     # print('i am returning',(predicted_winner,whitewins))
-    return predicted_winner,whitewins
+    return predicted_winner
 
 def mix_com_weight(white,black,g,threshold):
     comm_rate = common_neighbors(white,black,g,threshold)
@@ -125,8 +126,8 @@ def mix_com_weight(white,black,g,threshold):
     if comm_rate == 'SKIP' or ew_rate == 'SKIP': return 'SKIP'
     print('common_neighbor value is:',comm_rate[1],' edge_weight value is:',ew_rate[1])
     combined_rate = comm_rate[1] * ew_rate[1]
-    if combined_rate > 1: return 'white',combined_rate
-    elif combined_rate < 1: return 'black',combined_rate
+    if combined_rate > 1: return 'white'
+    elif combined_rate < 1: return 'black'
     else: return 'SKIP'
 
 def number_paths(white,black,g,threshold):
@@ -140,8 +141,8 @@ def number_paths(white,black,g,threshold):
     # if w_to_b < threshold or b_to_w < threshold: return 'SKIP'
     if w_to_b == 0 or b_to_w == 0: return 'SKIP'
     rate = w_to_b/b_to_w
-    if rate > 1: return 'white', rate
-    elif rate < 1: return 'black',rate
+    if rate > 1: return 'white'
+    elif rate < 1: return 'black'
     else: return 'SKIP'
 
 def edge_weights(white,black,g,threshold):
@@ -157,16 +158,40 @@ def edge_weights(white,black,g,threshold):
     b_vic_score = sum([g.get_edge_data(black,bv)['weight'] for bv in b_victories])
     b_los_score = sum([g.get_edge_data(bl,black)['weight'] for bl in b_losses])
     b_rate = b_vic_score/b_los_score
+    if b_rate == 0 or w_rate == 0: return 'SKIP'
     rate = w_rate/b_rate
-    if rate > 1: return 'white',rate
-    elif rate < 1: return 'black',rate
+    if rate > 1: return 'white'
+    elif rate < 1: return 'black'
     else: return 'SKIP'
 
-def pagerank(white,black,pg):
-    # let's see how well networkx pagerank works
-    rate = pg[white]/pg[black]
-    if rate > 1: return 'white',rate
-    elif rate < 1: return 'black',rate
+def random_walk(source,g,num):
+    visits = {}
+    alpha = 0.1
+    for v in g.nodes(): visits[v] = 0
+    for i in range(num):
+        # we want to use edges because calling successors 
+        # returns the multi-edged ones only once,
+        # but the edges show all the edges
+        edges = list(g.edges(source))
+        while random.random() > alpha and edges:
+            d = random.choice(edges)[1]
+            visits[d] += 1
+            edges = list(g.edges(d))
+    for v in g.nodes(): visits[v] /= num
+    return visits
+
+def coinflip(white,black,g,threshold):
+    # I decided i want to compare this to a truly random guess
+    if random.random() > .4: return 'white'
+    else: return 'black'
+
+
+def pagerank_easy(white,black,g,threshold):
+    # do two walks for each white as source and black as source.
+    v_white = random_walk(white,g,threshold)
+    v_black = random_walk(black,g,threshold)
+    if v_white[black] > v_black[white]: return 'white'
+    elif v_white[black] < v_black[white]: return 'black'
     else: return 'SKIP'
 
 def calculate_fairgoodness(g,threshold):
@@ -200,13 +225,11 @@ def calculate_fairgoodness(g,threshold):
             values[u]['f'] = 1 - avg([newG.get_edge_data(u,v)['weight'] - values[v]['g'] for v in newG.neighbors(u)])
     return values
 
-
-def fairgoodness(white,black,)
+# def fairgoodness(white,black,)
 
 def simulate(test,g,threshold, fn):
     correct_times = 0
     total_times = 0
-    pr = nx.pagerank(g)
     for data in test:
         matchup = data
         # matchup is the data of the matchup happening
@@ -219,13 +242,12 @@ def simulate(test,g,threshold, fn):
             # print("one of the players do not have any record, skipping...")
             continue
         # here is when I start analyzing the players' past wins
-        if fn == pagerank: predicted_winner = fn(p_white,p_black,pr)
-        else: predicted_winner = fn(p_white,p_black,g,threshold)
+        predicted_winner = fn(p_white,p_black,g,threshold)
         if predicted_winner == 'SKIP': continue
         predicted_outcome = ''
-        if predicted_winner[0] == 'white': predicted_outcome = '1-0'
-        elif predicted_winner[0] == 'black': predicted_outcome = '0-1'
-        elif predicted_winner[0] == 'draw': predicted_outcome = '1/2-1/2'
+        if predicted_winner == 'white': predicted_outcome = '1-0'
+        elif predicted_winner == 'black': predicted_outcome = '0-1'
+        elif predicted_winner == 'draw': predicted_outcome = '1/2-1/2'
         # not enough data to make guess!
         # checking the actual winner here:
         if matchup['Result'] == predicted_outcome:
@@ -234,10 +256,10 @@ def simulate(test,g,threshold, fn):
         else:
             print('guess was wrong!',predicted_winner,'did not win!')
         total_times+=1
-        print('rate so far:',correct_times/total_times * 100 ,'percent, at',total_times,'guesses')
+        print('rate so far:',round(correct_times/total_times * 100,2) ,'percent, at',total_times,'guesses')
     print('correct times:',correct_times)
     print('total guesses:', total_times)
-    print("correctness was:",correct_times/total_times)
+    print('threshold was:',threshold)
 
 
 #===================DRIVER CODE======================
@@ -259,25 +281,40 @@ def simulate(test,g,threshold, fn):
 #     pickle.dump(test,outfile)
 #     outfile.close()
 
+# function to change directed graph to directed multidigraph
+def dgraph_to_mgraph(oldG):
+    G = nx.MultiDiGraph()
+    old_edges = list(oldG.edges)
+    new_edges = []
+    for ee in old_edges:
+        w = oldG.get_edge_data(ee[0],ee[1])['weight']
+        for i in range(w):
+            new_edges.append((ee[0],ee[1]))
+    G.add_edges_from(new_edges)
+    return G
+
 
 g1 = nx.read_gpickle('201911_graph')
+mg1 = nx.read_gpickle('201911_mgraph')
 d = open('201911_test','rb')
 t1 = pickle.load(d)
 d.close()
 
 g2 = nx.read_gpickle('201912_graph')
+mg2 = nx.read_gpickle('201912_mgraph')
 d = open('201912_test','rb')
 t2 = pickle.load(d)
 d.close()
 
 g3 = nx.read_gpickle('202001_graph')
+mg3 = nx.read_gpickle('202001_mgraph')
 d = open('202001_test','rb')
 t3 = pickle.load(d)
 d.close()
 
-simulate(test,g,20,common_neighbors)
-simulate(test,g,3,number_paths)
-simulate(test,g,20,edge_weights)
+# simulate(t1,mg1,500,pagerank_easy)
+simulate(t1,g1,1,coinflip)
+# simulate(t1,g1,20,edge_weights)
 
 # TODO: take in the opening moves as a factor in the prediction as well.
 # I'm just gonna use the opening ECO number, 
