@@ -31,6 +31,7 @@ Also, increasing threshold of past records for comm-neighbors and edge weights a
 |-|-|-|-|
 |3|55.98%|54.73%|55.32%|
 |4|%|%|%|
+
 **Even at threshold of length 4, each run took over 10 minutes, so it's pretty inefficient, compared to toerh methods**
 
 For the pagerank algorithm, I changed my implementation a bit so that it would work better for my example (or so I thought)
