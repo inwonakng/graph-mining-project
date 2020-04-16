@@ -1,10 +1,10 @@
 #python3
-import matplotlib.pyplot as plt
 import networkx as nx
 import chess.pgn as ch
 import datetime
 import pickle
 import random
+from tqdm import tqdm
 
 def read_data(file,limit):
     games = []
@@ -164,6 +164,11 @@ def edge_weights(white,black,g,threshold):
     elif rate < 1: return 'black'
     else: return 'SKIP'
 
+def coinflip(white,black,g,threshold):
+    # I decided i want to compare this to a truly random guess
+    if random.random() > .5: return 'white'
+    else: return 'black'
+
 def random_walk(source,g,num):
     visits = {}
     alpha = 0.1
@@ -179,12 +184,6 @@ def random_walk(source,g,num):
             edges = list(g.edges(d))
     for v in g.nodes(): visits[v] /= num
     return visits
-
-def coinflip(white,black,g,threshold):
-    # I decided i want to compare this to a truly random guess
-    if random.random() > .4: return 'white'
-    else: return 'black'
-
 
 def pagerank_easy(white,black,g,threshold):
     # do two walks for each white as source and black as source.
@@ -230,8 +229,8 @@ def calculate_fairgoodness(g,threshold):
 def simulate(test,g,threshold, fn):
     correct_times = 0
     total_times = 0
-    for data in test:
-        matchup = data
+    for i in tqdm(range(len(test))):
+        matchup = test[i]
         # matchup is the data of the matchup happening
         p_white = matchup['White']
         p_black = matchup['Black']
@@ -251,12 +250,13 @@ def simulate(test,g,threshold, fn):
         # not enough data to make guess!
         # checking the actual winner here:
         if matchup['Result'] == predicted_outcome:
-            print('guessed right!',predicted_winner,'wins!')
+            # print('guessed right!',predicted_winner,'wins!')
             correct_times += 1
-        else:
-            print('guess was wrong!',predicted_winner,'did not win!')
+        # else:
+            # print('guess was wrong!',predicted_winner,'did not win!')
         total_times+=1
-        print('rate so far:',round(correct_times/total_times * 100,2) ,'percent, at',total_times,'guesses')
+        # print('rate so far:',round(correct_times/total_times * 100,2) ,'percent, at',total_times,'guesses')
+    print('rate:',round(correct_times/total_times * 100,2),'%')
     print('correct times:',correct_times)
     print('total guesses:', total_times)
     print('threshold was:',threshold)
@@ -312,8 +312,18 @@ d = open('202001_test','rb')
 t3 = pickle.load(d)
 d.close()
 
+'''The only part that matters for running the prediction:'''
 # simulate(t1,mg1,500,pagerank_easy)
-simulate(t1,g1,1,coinflip)
+type = 'Number Paths'
+fn = number_paths
+thres = 3
+
+print(type,'for dataset 1')
+simulate(t1,g1,thres,fn)
+print(type,'for dataset 2')
+simulate(t2,g2,thres,fn)
+print(type,'for dataset 3')
+simulate(t3,g3,thres,fn)
 # simulate(t1,g1,20,edge_weights)
 
 # TODO: take in the opening moves as a factor in the prediction as well.
