@@ -113,7 +113,8 @@ This is my code for calculating the fairness/goodness scores for a given MultiDi
 def calculate_fairgoodness(oldG,threshold):
     import copy
     g = copy.deepcopy(oldG)
-    # for this method to work we need back edges for all edge
+    # for this method to work we need back edges (loss edges) 
+    # for all edge (which are victory only right now)
     # g is a multidigraph, just like for the pageranks
     data = {}
     for e in g.edges: data[e] = {'weight':0.9}
@@ -130,13 +131,11 @@ def calculate_fairgoodness(oldG,threshold):
         vals[v]['g'] = 1
     for i in range(threshold):
         for v in g.nodes:
-            # turn it into set first to get rid of duplicates
-            # because i handle that while looping later
             in_edges = list(set(g.in_edges(v)))
             out_edges = list(set(g.edges(v)))
-            # Weight of outgoing edge - goodness of that edge being judged            
             fair = []
             good = []
+            # Weight of outgoing edge - goodness of that edge being judged            
             for e in out_edges:
                 ed = g.get_edge_data(e[0],e[1])
                 for k,w in ed.items():
