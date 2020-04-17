@@ -72,25 +72,106 @@ def random_walk(source,g,num):
 ### My Pagerank Implementation Performance
  **Since the output for this tends to be more random, I will run these guys multiple times**
 
-##### Trial 1
+#### Trial 1
 |Number of 'Random Walk'|Dataset 1|Dataset 2|Dataset 3|
-|-|-|-|-|
+|-|-:|-:|-:|
 |100|48.42%|50.45%|51.12%|
 |1000|49.84%|50.42%|51.27%|
 |10000|50.26%|50.8%|51.49%|
 
-##### Trial 2
+#### Trial 2
 |Number of 'Random Walk'|Dataset 1|Dataset 2|Dataset 3|
-|-|-|-|-|
+|-|-:|-:|-:|
 |100|48.37%|49.41%|50.45%|
 |1000|49.98%|49.98%|51.1%|
 |10000|50.5%|50.98%|51.4%|
 
-##### Trial 3
+#### Trial 3
 |Number of 'Random Walk'|Dataset 1|Dataset 2|Dataset 3|
-|-|-|-|-|
+|-|-:|-:|-:|
 |100|49.15%|48.63%|49.97%|
 |1000|50.18%|50.96%|51.1%|
 |10000|50.08%|50.97%|51.51%|
 
 **at iteration=10000, it was taking like an hour or so to complete the tests (so 40000 iterations of future matches), so I'm not sure if it is worth trying anything bigger, although the accuracy does go up as the iteration does**
+
+### Fairness / Goodness Method!
+###### This was kind of hard to implement, but at least it performs the best, so all worth it
+
+This method is an implementation of a social network graph's link weight prediction algorithm
+It is described [here](https://cs.stanford.edu/~srijan/wsn/) and I used the [slides](https://cs.umd.edu/~srijan/pubs/wsn-icdm2016.pptx) for reference when implementing the code for it.
+The idea is that two values, fairness and goodness for each node u,v can be used to predict the weight of a link forming between them.
+For an edge going from u to v, the weight is predicted using u_fairness * v_goodness.
+Fairness score will be higher for nodes whos outgoing weight to another node accurately represents that destination node's 'goodness'
+And the goodness score is calculated by how well 'fair' nodes judge it (weight of the node coming in from such nodes)
+Sort of like pageranks, this algorithm takes many iterations to gradually even out the scores for all nodes.
+And the victory is predicted by seeing which direction edge will have a greater 'weight'
+
+This is my code for calculating the fairness/goodness scores for a given MultiDiGraph g
+
+```
+def calculate_fairgoodness(oldG,threshold):
+    import copy
+    g = copy.deepcopy(oldG)
+    # for this method to work we need back edges for all edge
+    # g is a multidigraph, just like for the pageranks
+    data = {}
+    for e in g.edges: data[e] = {'weight':0.9}
+    nx.set_edge_attributes(g,data)
+    toadd = [(e[1],e[0]) for e in g.edges]
+    g.add_edges_from(toadd,weight=0.1)
+    # now all the original edges in g have weight 1 
+    # and the back edges have weight 0
+    vals = {}
+    # initiating values 
+    for v in g.nodes: 
+        vals[v] = {}
+        vals[v]['f'] = 1
+        vals[v]['g'] = 1
+    for i in range(threshold):
+        for v in g.nodes:
+            # turn it into set first to get rid of duplicates
+            # because i handle that while looping later
+            in_edges = list(set(g.in_edges(v)))
+            out_edges = list(set(g.edges(v)))
+            # Weight of outgoing edge - goodness of that edge being judged            
+            fair = []
+            good = []
+            for e in out_edges:
+                ed = g.get_edge_data(e[0],e[1])
+                for k,w in ed.items():
+                    fair.append(abs(w['weight']- vals[e[1]]['g']))
+            
+            # fairness of judging node * weight of the edge from that node
+            for e in in_edges:
+                ed = g.get_edge_data(e[0],e[1])
+                for k,w in ed.items():
+                    good.append(vals[e[0]]['f'] * w['weight'])
+
+            vals[v]['f'] = 1 - sum(fair)/(len(fair) * 2)
+            vals[v]['g'] = sum(good)/len(good)
+    return vals
+```
+
+|Number of Iterations|Dataset 1|Dataset 2|Dataset 3|
+|:-:|-:|-:|-:|
+|100|58.0%|57.83%|58.0%|
+|1000|58.0%|57.83%|58.0%|
+
+I stopped after 1000 iterations, because it seemed like the values settled down enough already for 100 iterations.
+So now I will try tweaking the values to see if I can make it even better.
+
+For those above results, I gave the victory edges a weight of 0.9 and the back edges for those edges (basically loss edge) a weight of 0.1. This was because if I gave the losing edges a weight of 0, the goodness scores will just sum up to 0 in many cases since whatever fairness the other node has is just multiplied to 0.
+
+Following is the result when I try tweaking these weights:
+
+|victory/loss weights|Dataset 1|Dataset 2|Dataset 3|
+|:-:|-:|-:|-:|
+|0.99/0.01|58.02%|57.83%|57.98%|
+|0.8/0.2|58.0%|57.83%|57.99%|
+|1/-1|57.86%|57.78%|57.94%|
+
+So I assumed(hoped) that changing the edge weights to 1 and -1 will drastically effect the accuracy, but I guess it just consistently brought it down.
+I suspect this is because 0.9 and 0.1 make a much larger difference when being multiplied since the method takes absoulte values anyways.
+
+

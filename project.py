@@ -207,38 +207,61 @@ def pagerank_easy(white,black,g,num_iter):
     elif v_white[black] < v_black[white]: return 'black'
     else: return 'SKIP'
 
-def calculate_fairgoodness(g,threshold):
-    # for this to work, I will first normalize all the weights
-    # So i make a new graph with the edges and whatnot
-    # This new graph has edges going both ways for every interaction
-    # and the weight of the two edges between a pair of nodes will always sum to 1
-    newG = nx.DiGraph()
-    for u in g.nodes():
-        for v in g.nodes():
-            if u == v: continue
-            if g.has_edge(u,v) and not newG.has_edge(u,v):
-                w = g.get_edge_data(u,v)['weight']
-                if g.has_edge(v,u):
-                    w1 = g.get_edge_data(v,u)['weight']
-                    newG.add_edge(u,v,weight=w/(w+w1))
-                else:
-                    newG.add_edge(u,v,weight=1)
-                    newG.add_edge(v,u,weight=0)
-    # initiate both fairness and goodness as 1 for all nodes
-    starting = {'f': 1, 'g':1}
-    values = {}
-    # initiating
-    for u in newG.nodes(): values[u] = starting
-    def avg(lst): 
-        if len(lst) > 0: return sum(lst)/len(lst) 
-        else: return 0
-    for i in range(threshold):
-        for u in newG.nodes():
-            values[u]['g'] = avg([values[v]['f'] * newG.get_edge_data(v,u)['weight'] for v in newG.predecessors(u)])
-            values[u]['f'] = 1 - avg([newG.get_edge_data(u,v)['weight'] - values[v]['g'] for v in newG.neighbors(u)])
-    return values
+def calculate_fairgoodness(oldG,threshold):
+    import copy
+    g = copy.deepcopy(oldG)
+    # for this method to work we need back edges for all edge
+    # g is a multidigraph, just like for the pageranks
+    data = {}
+    for e in g.edges: data[e] = {'weight':1}
+    nx.set_edge_attributes(g,data)
+    toadd = [(e[1],e[0]) for e in g.edges]
+    g.add_edges_from(toadd,weight=-1)
+    # now all the original edges in g have weight 1 
+    # and the back edges have weight 0
+    vals = {}
+    # initiating values 
+    for v in g.nodes: 
+        vals[v] = {}
+        vals[v]['f'] = 1
+        vals[v]['g'] = 1
+    print('prepping data...')
+    for i in tqdm(range(threshold)):
+        for v in g.nodes:
+            # turn it into set first to get rid of duplicates
+            # because i handle that while looping later
+            in_edges = list(set(g.in_edges(v)))
+            out_edges = list(set(g.edges(v)))
+            # Weight of outgoing edge - goodness of that edge being judged            
+            fair = []
+            good = []
+            for e in out_edges:
+                ed = g.get_edge_data(e[0],e[1])
+                for k,w in ed.items():
+                    fair.append(abs(w['weight']- vals[e[1]]['g']))
+            
+            # fairness of judging node * weight of the edge from that node
+            for e in in_edges:
+                ed = g.get_edge_data(e[0],e[1])
+                for k,w in ed.items():
+                    good.append(vals[e[0]]['f'] * w['weight'])
 
-# def fairgoodness(white,black,)
+            vals[v]['f'] = 1 - sum(fair)/(len(fair) * 2)
+            vals[v]['g'] = sum(good)/len(good)
+    return vals
+    
+
+def fairgoodness(white,black,g,threshold):
+    global fg
+    w_fair = fg[white]['f']
+    w_good = fg[white]['g']
+    b_fair = fg[black]['f']
+    b_good = fg[black]['g']
+    w_to_b = w_fair * b_good
+    b_to_w = b_fair * w_good
+    if w_to_b > b_to_w: return 'white'
+    elif b_to_w > w_to_b: return 'black'
+    else: return 'SKIP'
 
 def simulate(test,g,threshold, fn):
     correct_times = 0
@@ -328,23 +351,30 @@ d.close()
 
 '''The only part that matters for running the prediction:'''
 # simulate(t1,mg1,500,pagerank_easy)
-type = 'Number Paths'
-fn = number_paths
-thres = 4
+type = 'Fair/Goodness'
+fn = fairgoodness
+thres = 100
+
+fg = calculate_fairgoodness(mg1,thres)
 
 print('======================')
 print(type,'for dataset 1')
 stored_pagerank = {}
 simulate(t1,g1,thres,fn)
+
+fg = calculate_fairgoodness(mg2,thres)
+
 print('======================')
 print(type,'for dataset 2')
 stored_pagerank = {}
 simulate(t2,g2,thres,fn)
+
+fg = calculate_fairgoodness(mg3,thres)
+
 print('======================')
 print(type,'for dataset 3')
 stored_pagerank = {}
 simulate(t3,g3,thres,fn)
-
 
 # TODO: take in the opening moves as a factor in the prediction as well.
 # I'm just gonna use the opening ECO number, 
