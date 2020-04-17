@@ -6,7 +6,7 @@ Packages needed to run this code:
 - python-chess (for unpacking/parsing the game data from .pgn files)
 
 ### Changes from the update presentation:
-Looks like I lied about 70 percent being below average for a 'goog' prediction rate. I checked my references again (and also tried actually randomly guessing), and it seems that around 50% is average, and nearing 70% is actually a very good predictor.
+Looks like I lied about 70 percent being below average for a 'good' prediction rate. I checked my references again (and also tried actually randomly guessing), and it seems that around 50% is average, and nearing 70% is actually a very good predictor.
 
 And for some reason, pagerank is actually not as good as common neighbors or edge weights(win rates) method. 
 So far, a 50/50 (coinflip) perdiction yields ~48% accuracy.
