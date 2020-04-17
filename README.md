@@ -1,11 +1,11 @@
 I uploaded the pickled versions of the data I had, but I'm not sure if it's going to work the same in other systems.
-If they do not work, the data can be found ![here](https://www.ficsgames.org/download.html)
+If they do not work, the data can be found [here](https://www.ficsgames.org/download.html)
 
 Packages needed to run this code:
-- tqdm (for status bar when testing the predictions)        
+- tqdm (for status bar when testing the predictions because I get curious if it is working at all when it takes too long)        
 - python-chess (for unpacking/parsing the game data from .pgn files)
 
-Changes from the update presentation:
+### Changes from the update presentation:
 Looks like I lied about 70 percent being below average for a 'goog' prediction rate. I checked my references again (and also tried actually randomly guessing), and it seems that around 50% is average, and nearing 70% is actually a very good predictor.
 
 And for some reason, pagerank is actually not as good as common neighbors or edge weights(win rates) method. 
