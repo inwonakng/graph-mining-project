@@ -177,18 +177,32 @@ def random_walk(source,g,num):
         # we want to use edges because calling successors 
         # returns the multi-edged ones only once,
         # but the edges show all the edges
+        d = source
         edges = list(g.edges(source))
         while random.random() > alpha and edges:
+            # stops either when the random value is lower than alpha
+            # or when there are no more edges to take
             d = random.choice(edges)[1]
-            visits[d] += 1
             edges = list(g.edges(d))
+        visits[d] += 1
     for v in g.nodes(): visits[v] /= num
     return visits
 
-def pagerank_easy(white,black,g,threshold):
+def pagerank_easy(white,black,g,num_iter):
+    global stored_pagerank
     # do two walks for each white as source and black as source.
-    v_white = random_walk(white,g,threshold)
-    v_black = random_walk(black,g,threshold)
+    if not white in stored_pagerank: 
+        v_white = random_walk(white,g,num_iter)
+        stored_pagerank[white] = v_white
+    else:
+        v_white = stored_pagerank[white]
+
+    if not black in stored_pagerank: 
+        v_black = random_walk(black,g,num_iter)
+        stored_pagerank[black] = v_black
+    else:
+        v_black = stored_pagerank[black]
+
     if v_white[black] > v_black[white]: return 'white'
     elif v_white[black] < v_black[white]: return 'black'
     else: return 'SKIP'
@@ -316,15 +330,21 @@ d.close()
 # simulate(t1,mg1,500,pagerank_easy)
 type = 'Number Paths'
 fn = number_paths
-thres = 3
+thres = 4
 
+print('======================')
 print(type,'for dataset 1')
+stored_pagerank = {}
 simulate(t1,g1,thres,fn)
+print('======================')
 print(type,'for dataset 2')
+stored_pagerank = {}
 simulate(t2,g2,thres,fn)
+print('======================')
 print(type,'for dataset 3')
+stored_pagerank = {}
 simulate(t3,g3,thres,fn)
-# simulate(t1,g1,20,edge_weights)
+
 
 # TODO: take in the opening moves as a factor in the prediction as well.
 # I'm just gonna use the opening ECO number, 
