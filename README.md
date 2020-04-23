@@ -57,7 +57,7 @@ And of course, seems that increasing the number of training data (although the n
 For the pagerank algorithm, I changed my implementation a bit so that it would work better for my example (or so I think)
 And for a number of given iterations, the algorithm starts with a given source. It will try to visit other nodes that a directed edge takes it until it meets a dead end or the random value generated is less than alpha (currently set to 0.1, this is just to give some more randomness and finish the walks early so it doesn't take forever) 
 So it is really a derivative of the 'personalized pagerank' we did in class.
-It will do this for a given number of iterations, and each time I evaluate a matchup, I run this for both players, which is probably why this is so slow. In order to avoid doing the calculation for the same player every time, I am storing the for each player every time I calculate it, so that I can re-use it for recurring players.
+It will do this for a given number of iterations, and each time I evaluate a matchup, I run this for both players, which is probably why this is so slow. In order to avoid doing the calculation for the same player every time, I am storing the value for each player every time I calculate it, so that I can re-use it for recurring players.
 
 My Implementation of a random walk:
 ```
@@ -193,18 +193,26 @@ def calculate_fairgoodness(oldG,threshold):
             vals[v]['g'] = sum(good)/len(good)
     return vals
 ```
+### Number of games read in (used 60% as training data) = 100,000
 
 |Number of Iterations|Dataset 1|Dataset 2|Dataset 3|
 |:-:|-:|-:|-:|
-|100|58.0%|57.83%|58.0%|
-|1000|58.0%|57.83%|58.0%|
+|100|57.14%|56.65%|57.27%|
+|1000|57.14%|56.65%|57.27%|
+
+### Number of games read in (used 60% as training data) = 200,000
+
+|Number of Iterations|Dataset 1|Dataset 2|Dataset 3|
+|:-:|-:|-:|-:|
+|100|58.4%|57.92%|58.41%|
+|1000|58.4%|57.92%|58.41%|
 
 I stopped after 1000 iterations, because it seemed like the values settled down enough already for 100 iterations.
 So now I will try tweaking the values to see if I can make it even better.
 
 For those above results, I gave the victory edges a weight of 0.9 and the back edges for those edges (basically loss edge) a weight of 0.1. This was because if I gave the losing edges a weight of 0, the goodness scores will just sum up to 0 in many cases since whatever fairness the other node has is just multiplied to 0.
 
-Following is the result when I try tweaking these weights:
+Following is the result when I try tweaking these weights (I only did this with the smaller data):
 
 |victory/loss weights|Dataset 1|Dataset 2|Dataset 3|
 |:-:|-:|-:|-:|
@@ -219,17 +227,68 @@ I suspect this is because 0.9 and 0.1 make a much larger difference when being m
 
 #### Number of games read in (used 60% as training data) = 100,000
 |Prediction Method|Dataset 1|Dataset 2|Dataset 3|
-|-|-|-|-|
+|-|-:|-:|-:|
 |Common Neighbors|56.36%|55.92%|56.23%|
-|Edge Weights|57.95%|57.62%|57.81%|
+|Edge Weights|56.8%|56.46%|56.89%|
 
-
-Booo values went down!
-
-
-#### Threshold = 1
 #### Number of games read in (used 60% as training data) = 200,000
 |Prediction Method|Dataset 1|Dataset 2|Dataset 3|
-|-|-|-|-|
+|-|-:|-:|-:|
 |Common Neighbors|56.89%|56.37%|56.82%|
-|Edge Weights|58.3%|57.8%|58.28%|
+|Edge Weights|57.81%|57.62%|57.83%|
+
+Boooo values went down! 
+So seems that which color the player is playing from is not as important as I thought
+
+### Another Change: 
+So far, I have been skipping results where I could have predicted a 'draw'. 
+This was because I figured that the chances I get predict a draw correctly is so low that it would be better to just skip that part.
+When I skipped, I was not incrementing the number of total guesses I had, so the rates I had so far are essentially rates for getting just the win rate correctly. Now I wanted to see how well I could do for each color, and if there was a difference at all, since the revised common-neighbors and edge-weights methods actually performed worse than before.
+
+For this case, I am only using the bigger datasets (aka read in 200,000 games, and actually has slightly more than 100,000 games)
+
+#### For Dataset 1:
+|Prediction Method|Total accuracy rate|White accuracy rate|Black accuracy rate|Draw accuracy rate|
+|-|-:|-:|-:|-:|
+|Common Neighbors|55.51%|58.43%|54.99%|4.62%|
+|Edge Weights|58.24%|60.08%|56.55%|7.27%|
+|Number of Paths (3)|45.39%|58.3%|54.42%|4.13%|
+|Number of Paths (4)|55.62%|58.5%|54.96%|4.86%|
+|PageRanks #1 (100)|11.93%|50.94%|47.23%|3.56%|
+|PageRanks #2 (100)|11.93%|48.47%|46.59%|3.56%|
+|PageRanks #3 (100)|12.36%|51.71%|47.08%|3.59%|
+|PageRanks #1 (1000)|34.68%|51.69%|48.38%|3.55%|
+|PageRanks #2 (1000)|34.18%|52.01%|48.52%|3.54%|
+|PageRanks #3 (1000)|34.48%|51.66%|48.62%|3.42%|
+
+#### For Dataset 2:
+|Prediction Method|Total accuracy rate|White accuracy rate|Black accuracy rate|Draw accuracy rate|
+|-|-:|-:|-:|-:|
+|Common Neighbors|55.49%|58.0%|55.26%|4.43%|
+|Edge Weights|57.73%|59.2%|56.41%|3.92%|
+|Number of Paths (3)|44.01%|56.51%|53.83%|4.23%|
+|Number of Paths (4)|55.29%|57.93%|54.91%|4.62%|
+|PageRanks #1 (100)|12.69%|52.15%|47.97%|3.58%|
+|PageRanks #2 (100)|12.26%|49.83%|46.94%|3.51%|
+|PageRanks #3 (100)|12.31%|51.88%|47.87%|3.58%|
+|PageRanks #1 (1000)|35.36%|51.95%|49.45%|3.4%|
+|PageRanks #2 (1000)|35.22%|51.8%|48.93%|3.53%|
+|PageRanks #3 (1000)|35.2%|52.02%|49.23%|3.41%|
+
+#### For Dataset 3:
+|Prediction Method|Total accuracy rate|White accuracy rate|Black accuracy rate|Draw accuracy rate|
+|-|-:|-:|-:|-:|
+|Common Neighbors|55.31%|57.55%|55.49%|3.47%|
+|Edge Weights|58.22%|59.52%|57.04%|4.65%|
+|Number of Paths (3)|44.9%|56.4%|54.4%|5.16%|
+|Number of Paths (4)|55.26%|57.52%|55.4%|3.53%|
+|PageRanks #1 (100)|13.13%|51.7%|48.55%|3.67%|
+|PageRanks #2 (100)|13.58%|52.25%|50.12%|3.72%|
+|PageRanks #3 (100)|13.29%|51.78%|50.18%|3.61%|
+|PageRanks #1 (1000)|36.75%|52.49%|50.08%|3.4%|
+|PageRanks #2 (1000)|36.8%|52.48%|50.21%|3.43%|
+|PageRanks #3 (1000)|36.04%|52.34%|49.96%|3.58%|
+
+**Note: Pagerank performance became attrocious!!**
+
+I did not include the data for fairness/goodness because that algorithm actually does not guess draws for any dataset. I think this is because there are too many factors for the values being compared to be equal, which actually ends up making it the most accurate since draws are rare cases.

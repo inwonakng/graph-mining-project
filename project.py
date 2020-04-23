@@ -211,11 +211,15 @@ def edge_weights(white,black,g,threshold):
 
 # essentially a win rate for the player as the color they have
 def edge_weights_consider_side(white,black,g,threshold):
-    w_vic_as_w = [g.get_edge_data(white,p)['whitewin'] for p in g.neighbors(white)]
-    w_los_as_w = [g.get_edge_data(p,white)['blackwin'] for p in g.predecessors(white)]
+    w_vic_as_w = sum([g.get_edge_data(white,p)['whitewin'] for p in g.neighbors(white)])
+    w_los_as_w = sum([g.get_edge_data(p,white)['blackwin'] for p in g.predecessors(white)])
 
-    b_vic_as_b = [g.get_edge_data(black,p)['blackwin'] for p in g.neighbors(black)]
-    b_los_as_b = [g.get_edge_data(p,black)['whitewin'] for p in g.predecessors(black)]
+    b_vic_as_b = sum([g.get_edge_data(black,p)['blackwin'] for p in g.neighbors(black)])
+    b_los_as_b = sum([g.get_edge_data(p,black)['whitewin'] for p in g.predecessors(black)])
+
+    # if the sum of either of these values is 0, means there is no data for that player
+    # so makes sense to skip
+    if not (w_vic_as_w+w_los_as_w) or not (b_vic_as_b+b_los_as_b): return 'SKIP'
 
     w_rate = w_vic_as_w/(w_vic_as_w+w_los_as_w)
     b_rate = b_vic_as_b/(b_vic_as_b+b_los_as_b)
@@ -271,10 +275,10 @@ def calculate_fairgoodness(oldG,threshold):
     # for this method to work we need back edges for all edge
     # g is a multidigraph, just like for the pageranks
     data = {}
-    for e in g.edges: data[e] = {'weight':1}
+    for e in g.edges: data[e] = {'weight':0.9}
     nx.set_edge_attributes(g,data)
     toadd = [(e[1],e[0]) for e in g.edges]
-    g.add_edges_from(toadd,weight=-1)
+    g.add_edges_from(toadd,weight=0.1)
     # now all the original edges in g have weight 1 
     # and the back edges have weight 0
     vals = {}
@@ -323,7 +327,7 @@ def fairgoodness(white,black,g,threshold):
     b_to_w = b_fair * w_good
     if w_to_b > b_to_w: return 'white'
     elif b_to_w > w_to_b: return 'black'
-    else: return 'DRAW'
+    else: return 'draw'
 
 ###################################################################################
 
@@ -377,13 +381,13 @@ def simulate(test,g,threshold, fn):
             # print('guess was wrong!',predicted_winner,'did not win!')
         total_times+=1
         # print('rate so far:',round(correct_times/total_times * 100,2) ,'percent, at',total_times,'guesses')
-    print('total accuracy rate:   ',round(correct_times/total_times * 100,2),'%')
+    print('total accuracy rate   :',round(correct_times/total_times * 100,2),'%')
     print('accuracy for white win:',round(correct_whitewin/predicted_whitewin * 100,2),'%')
     print('accuracy for black win:',round(correct_blackwin/predicted_blackwin * 100,2),'%')
-    print('accuracy for draw:     ',round(correct_draw/predicted_draw * 100,2),'%')
-    print('correct times:         ',correct_times)
-    print('total guesses:         ', total_times)
-    print('threshold was:         ',threshold)
+    if predicted_draw: print('accuracy for draw     :',round(correct_draw/predicted_draw * 100,2),'%')
+    print('correct times         :',correct_times)
+    print('total guesses         :', total_times)
+    print('threshold was         :',threshold)
 
 def read_prepped_data(smaller):
     prefix = 'data_200000/'
@@ -418,8 +422,7 @@ def dgraph_to_mgraph(oldG):
         whitewincount = oldG.get_edge_data(ee[0],ee[1])['whitewin']
         w = oldG.get_edge_data(ee[0],ee[1])['weight']
         for i in range(w):
-            if i < whitewincount: new_edges.append((ee[0],ee[1],{'win_as':'white'}))
-            else: new_edges.append((ee[0],ee[1],{'win_as':'black'}))
+            new_edges.append((ee[0],ee[1]))
     G.add_edges_from(new_edges)
     return G
     
@@ -460,7 +463,8 @@ quit()
 # This line reads in the pickled data .
 # Parameter determines whether it is from a dataset of approx. 50,000 games or 100,000 games
 # I just left the smaller dataset since that's what I started with, before I realized that it could get bigger
-g1,mg1,t1,g2,mg2,t2,g3,mg3,t3 = read_prepped_data(False)
+smalldata = False
+g1,mg1,t1,g2,mg2,t2,g3,mg3,t3 = read_prepped_data(smalldata)
 
 
 # IMPORTANT! 
@@ -471,26 +475,124 @@ g1,mg1,t1,g2,mg2,t2,g3,mg3,t3 = read_prepped_data(False)
 
 '''The only part that matters for running the prediction:'''
 # simulate(t1,mg1,500,pagerank_easy)
-type = 'Common Neighbors'
-fn = common_neighbors
-thres = 1
-
-# fg = calculate_fairgoodness(mg1,thres)
-print('======================')
-print(type,'for dataset 1')
-stored_pagerank = {}
-simulate(t1,g1,thres,fn)
-
-# fg = calculate_fairgoodness(mg2,thres)
+what_to_print   = 'Common Neighbors method'
+test_type       = common_neighbors
+thres           = 1
 
 print('======================')
-print(type,'for dataset 2')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg1,thres)
+print(what_to_print,'for dataset 1')
 stored_pagerank = {}
-simulate(t2,g2,thres,fn)
+simulate(t1,g1,thres,test_type)
 
-# fg = calculate_fairgoodness(mg3,thres)
 
 print('======================')
-print(type,'for dataset 3')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg2,thres)
+print(what_to_print,'for dataset 2')
 stored_pagerank = {}
-simulate(t3,g3,thres,fn)
+simulate(t2,g2,thres,test_type)
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg3,thres)
+print(what_to_print,'for dataset 3')
+stored_pagerank = {}
+simulate(t3,g3,thres,test_type)
+
+
+what_to_print   = 'Edge weights method'
+test_type       = edge_weights
+thres           = 1
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg1,thres)
+print(what_to_print,'for dataset 1')
+stored_pagerank = {}
+simulate(t1,g1,thres,test_type)
+
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg2,thres)
+print(what_to_print,'for dataset 2')
+stored_pagerank = {}
+simulate(t2,g2,thres,test_type)
+
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg3,thres)
+print(what_to_print,'for dataset 3')
+stored_pagerank = {}
+simulate(t3,g3,thres,test_type)
+
+
+what_to_print   = 'Path Length Method'
+test_type       = number_paths
+thres           = 2
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg1,thres)
+print(what_to_print,'for dataset 1')
+stored_pagerank = {}
+simulate(t1,g1,thres,test_type)
+
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg2,thres)
+print(what_to_print,'for dataset 2')
+stored_pagerank = {}
+simulate(t2,g2,thres,test_type)
+
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg3,thres)
+print(what_to_print,'for dataset 3')
+stored_pagerank = {}
+simulate(t3,g3,thres,test_type)
+
+what_to_print   = 'Path Length method'
+test_type       = common_neighbors
+thres           = 3
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg1,thres)
+print(what_to_print,'for dataset 1')
+stored_pagerank = {}
+simulate(t1,g1,thres,test_type)
+
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg2,thres)
+print(what_to_print,'for dataset 2')
+stored_pagerank = {}
+simulate(t2,g2,thres,test_type)
+
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg3,thres)
+print(what_to_print,'for dataset 3')
+stored_pagerank = {}
+simulate(t3,g3,thres,test_type)
+
+
+what_to_print   = 'Fair/Goodness'
+test_type       = fairgoodness
+thres           = 100
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg1,thres)
+print(what_to_print,'for dataset 1')
+stored_pagerank = {}
+simulate(t1,g1,thres,test_type)
+
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg2,thres)
+print(what_to_print,'for dataset 2')
+stored_pagerank = {}
+simulate(t2,g2,thres,test_type)
+
+
+print('======================')
+if test_type == fairgoodness: fg = calculate_fairgoodness(mg3,thres)
+print(what_to_print,'for dataset 3')
+stored_pagerank = {}
+simulate(t3,g3,thres,test_type)
