@@ -18,22 +18,39 @@ For reference, this is the performance of the coinflip method
 
 ### Performances so far
 #### Threshold = 1
+#### Number of games read in (used 60% as training data) = 100,000
 |Prediction Method|Dataset 1|Dataset 2|Dataset 3|
 |-|-|-|-|
 |Common Neighbors|56.73%|56.23%|56.42%|
 |Edge Weights|57.95%|57.62%|57.81%|
 
-(threshold of 1 means that it will not skip prediction for that match if there is at least one past record of each player, otherwise it does)
+#### Threshold = 1
+#### Number of games read in (used 60% as training data) = 200,000
+|Prediction Method|Dataset 1|Dataset 2|Dataset 3|
+|-|-|-|-|
+|Common Neighbors|56.71%|56.63%|56.53%|
+|Edge Weights|58.3%|57.8%|58.28%|
 
+
+(threshold of 1 means that it will not skip prediction for that match if there is at least one past record of each player, otherwise it does)
 Also, increasing threshold of past records for comm-neighbors and edge weights actually brings down the accuracy, which I assume is from the lack of samples. So I was also mistaken about this in my prior presentation as well.
+And of course, seems that increasing the number of training data (although the number of guesses is also going up) does bring up the accuracy.
 
 ### Performance of number paths method:
 #### Path length is also including the players being evaluated
+
+
+#### Number of games read in (used 60% as training data) = 100,000
 |Path Length threshold|Dataset 1|Dataset 2|Dataset 3|
 |:-:|-|-|-|
 |3|55.98%|54.73%|55.32%|
 |4|58.45%|57.66%|57.72%|
 
+#### Number of games read in (used 60% as training data) = 200,000
+|Path Length threshold|Dataset 1|Dataset 2|Dataset 3|
+|:-:|-|-|-|
+|3|56.36%|55.17%|55.39%|
+|4|58.44%|58.17%|%|
 
 **Even at threshold of length 4, each run took over 10 minutes, so it's pretty inefficient, compared to other methods**
 
@@ -72,6 +89,8 @@ def random_walk(source,g,num):
 ### My Pagerank Implementation Performance
  **Since the output for this tends to be more random, I will run these guys multiple times**
 
+### Number of games read in (used 60% as training data) = 100,000
+
 #### Trial 1
 |Number of 'Random Walk'|Dataset 1|Dataset 2|Dataset 3|
 |-|-:|-:|-:|
@@ -94,6 +113,29 @@ def random_walk(source,g,num):
 |10000|50.08%|50.97%|51.51%|
 
 **at iteration=10000, it was taking like an hour or so to complete the tests (so 40000 iterations of future matches), so I'm not sure if it is worth trying anything bigger, although the accuracy does go up as the iteration does**
+
+### Number of games read in (used 60% as training data) = 200,000
+
+#### Trial 1
+|Number of 'Random Walk'|Dataset 1|Dataset 2|Dataset 3|
+|-|-:|-:|-:|
+|100|48.52%|48.07%|51.38%|
+|1000|49.67%|50.12%|51.29%|
+
+#### Trial 2
+|Number of 'Random Walk'|Dataset 1|Dataset 2|Dataset 3|
+|-|-:|-:|-:|
+|100|48.66%|49.31%|51.18%|
+|1000|49.77%|50.08%|50.95%|
+
+#### Trial 3
+|Number of 'Random Walk'|Dataset 1|Dataset 2|Dataset 3|
+|-|-:|-:|-:|
+|100|49.75%|48.87%|51.09%|
+|1000|49.79%|50.05%|51.0%|
+
+**I had to omit iteration=10000 for this test because it was going to take like 10 hours per 1 test**
+
 
 ### Fairness / Goodness Method!
 ###### This was kind of hard to implement, but at least it performs the best, so all worth it
@@ -173,4 +215,21 @@ Following is the result when I try tweaking these weights:
 So I assumed(hoped) that changing the edge weights to 1 and -1 will drastically effect the accuracy, but I guess it just consistently brought it down.
 I suspect this is because 0.9 and 0.1 make a much larger difference when being multiplied since the method takes absoulte values anyways.
 
+### Trying to consider the side a player plays from!
 
+#### Number of games read in (used 60% as training data) = 100,000
+|Prediction Method|Dataset 1|Dataset 2|Dataset 3|
+|-|-|-|-|
+|Common Neighbors|56.36%|55.92%|56.23%|
+|Edge Weights|57.95%|57.62%|57.81%|
+
+
+Booo values went down!
+
+
+#### Threshold = 1
+#### Number of games read in (used 60% as training data) = 200,000
+|Prediction Method|Dataset 1|Dataset 2|Dataset 3|
+|-|-|-|-|
+|Common Neighbors|56.89%|56.37%|56.82%|
+|Edge Weights|58.3%|57.8%|58.28%|
