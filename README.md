@@ -292,3 +292,19 @@ For this case, I am only using the bigger datasets (aka read in 200,000 games, a
 **Note: Pagerank performance became attrocious!!**
 
 I did not include the data for fairness/goodness because that algorithm actually does not guess draws for any dataset. I think this is because there are too many factors for the values being compared to be equal, which actually ends up making it the most accurate since draws are rare cases.
+
+
+Since the table is very hard to read, here are the graphs for the accuracy value of each tests.
+Each chart represents the values for one dataset.
+
+#### Dataset 1
+
+![d](imgs/dataset1.png)
+
+#### Dataset 2
+
+![d](imgs/dataset2.png)
+
+#### Dataset 3
+
+![d](imgs/dataset3.png)
