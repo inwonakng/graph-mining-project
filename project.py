@@ -381,13 +381,19 @@ def simulate(test,g,threshold, fn):
             # print('guess was wrong!',predicted_winner,'did not win!')
         total_times+=1
         # print('rate so far:',round(correct_times/total_times * 100,2) ,'percent, at',total_times,'guesses')
-    print('total accuracy rate   :',round(correct_times/total_times * 100,2),'%')
-    print('accuracy for white win:',round(correct_whitewin/predicted_whitewin * 100,2),'%')
-    print('accuracy for black win:',round(correct_blackwin/predicted_blackwin * 100,2),'%')
-    if predicted_draw: print('accuracy for draw     :',round(correct_draw/predicted_draw * 100,2),'%')
-    print('correct times         :',correct_times)
-    print('total guesses         :', total_times)
-    print('threshold was         :',threshold)
+    print('total accuracy rate          :',round(correct_times/total_times * 100,2),'%')
+    print('accuracy for white win       :',round(correct_whitewin/predicted_whitewin * 100,2),'%')
+    print('accuracy for black win       :',round(correct_blackwin/predicted_blackwin * 100,2),'%')
+    if predicted_draw: print('accuracy for draw            :',round(correct_draw/predicted_draw * 100,2),'%')
+    print('correct times                :',correct_times)
+    print('total guesses                :', total_times)
+    print('correct times for white win  :',correct_whitewin)
+    print('total guesses for white win  :',predicted_whitewin)
+    print('correct times for white win  :',correct_blackwin)
+    print('total guesses for white win  :',predicted_blackwin)
+    print('correct times for draw       :',correct_draw)
+    print('total guesses for draw       :',predicted_draw)
+    print('threshold was                :',threshold)
 
 def read_prepped_data(smaller):
     prefix = 'data_200000/'
@@ -484,7 +490,6 @@ if test_type == fairgoodness: fg = calculate_fairgoodness(mg1,thres)
 print(what_to_print,'for dataset 1')
 stored_pagerank = {}
 simulate(t1,g1,thres,test_type)
-
 
 print('======================')
 if test_type == fairgoodness: fg = calculate_fairgoodness(mg2,thres)

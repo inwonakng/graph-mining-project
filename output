@@ -1,0 +1,494 @@
+#storing this just in case this turns out useful
+
+======================
+Common Neighbors for dataset 1
+100%|█████████████████████| 43789/43789 [00:00<00:00, 46671.79it/s]
+total accuracy rate          : 55.51 %
+accuracy for white win       : 58.43 %
+accuracy for black win       : 54.99 %
+accuracy for draw            : 4.62 %
+correct times                : 22448
+total guesses                : 40436
+correct times for white win  : 11550
+total guesses for white win  : 19766
+correct times for white win  : 10855
+total guesses for white win  : 19740
+correct times for draw       : 43
+total guesses for draw       : 930
+threshold was                : 1
+======================
+Common Neighbors for dataset 2
+100%|█████████████████████| 44111/44111 [00:00<00:00, 47719.61it/s]
+total accuracy rate          : 55.49 %
+accuracy for white win       : 58.0 %
+accuracy for black win       : 55.26 %
+accuracy for draw            : 4.43 %
+correct times                : 22270
+total guesses                : 40136
+correct times for white win  : 11431
+total guesses for white win  : 19710
+correct times for white win  : 10800
+total guesses for white win  : 19545
+correct times for draw       : 39
+total guesses for draw       : 881
+threshold was                : 1
+======================
+Common Neighbors for dataset 3
+100%|█████████████████████| 43011/43011 [00:00<00:00, 46260.08it/s]
+total accuracy rate          : 55.31 %
+accuracy for white win       : 57.55 %
+accuracy for black win       : 55.49 %
+accuracy for draw            : 3.47 %
+correct times                : 22105
+total guesses                : 39969
+correct times for white win  : 11303
+total guesses for white win  : 19640
+correct times for white win  : 10770
+total guesses for white win  : 19408
+correct times for draw       : 32
+total guesses for draw       : 921
+threshold was                : 1
+======================
+Edge Weights for dataset 1
+100%|█████████████████████| 43789/43789 [00:04<00:00, 10890.49it/s]
+total accuracy rate          : 58.24 %
+accuracy for white win       : 60.08 %
+accuracy for black win       : 56.55 %
+accuracy for draw            : 7.27 %
+correct times                : 23548
+total guesses                : 40436
+correct times for white win  : 12078
+total guesses for white win  : 20104
+correct times for white win  : 11466
+total guesses for white win  : 20277
+correct times for draw       : 4
+total guesses for draw       : 55
+threshold was                : 1
+======================
+Edge Weights for dataset 2
+100%|█████████████████████| 44111/44111 [00:04<00:00, 10905.52it/s]
+total accuracy rate          : 57.73 %
+accuracy for white win       : 59.2 %
+accuracy for black win       : 56.41 %
+accuracy for draw            : 3.92 %
+correct times                : 23172
+total guesses                : 40136
+correct times for white win  : 11864
+total guesses for white win  : 20042
+correct times for white win  : 11306
+total guesses for white win  : 20043
+correct times for draw       : 2
+total guesses for draw       : 51
+threshold was                : 1
+======================
+Edge Weights for dataset 3
+100%|█████████████████████| 43011/43011 [00:03<00:00, 11216.41it/s]
+total accuracy rate          : 58.22 %
+accuracy for white win       : 59.52 %
+accuracy for black win       : 57.04 %
+accuracy for draw            : 4.65 %
+correct times                : 23271
+total guesses                : 39969
+correct times for white win  : 11866
+total guesses for white win  : 19936
+correct times for white win  : 11403
+total guesses for white win  : 19990
+correct times for draw       : 2
+total guesses for draw       : 43
+threshold was                : 1
+======================
+Number Paths 3 for dataset 1
+100%|██████████████████████| 43789/43789 [00:33<00:00, 1323.31it/s]
+total accuracy rate          : 45.39 %
+accuracy for white win       : 58.3 %
+accuracy for black win       : 54.42 %
+accuracy for draw            : 4.13 %
+correct times                : 11715
+total guesses                : 25810
+correct times for white win  : 5932
+total guesses for white win  : 10175
+correct times for white win  : 5559
+total guesses for white win  : 10215
+correct times for draw       : 224
+total guesses for draw       : 5420
+threshold was                : 2
+======================
+Number Paths 3 for dataset 2
+100%|██████████████████████| 44111/44111 [00:31<00:00, 1414.22it/s]
+total accuracy rate          : 44.01 %
+accuracy for white win       : 56.51 %
+accuracy for black win       : 53.83 %
+accuracy for draw            : 4.23 %
+correct times                : 11508
+total guesses                : 26148
+correct times for white win  : 5761
+total guesses for white win  : 10195
+correct times for white win  : 5505
+total guesses for white win  : 10227
+correct times for draw       : 242
+total guesses for draw       : 5726
+threshold was                : 2
+======================
+Number Paths 3 for dataset 3
+100%|██████████████████████| 43011/43011 [00:33<00:00, 1288.42it/s]
+total accuracy rate          : 44.9 %
+accuracy for white win       : 56.4 %
+accuracy for black win       : 54.4 %
+accuracy for draw            : 5.16 %
+correct times                : 12260
+total guesses                : 27303
+correct times for white win  : 6030
+total guesses for white win  : 10692
+correct times for white win  : 5936
+total guesses for white win  : 10911
+correct times for draw       : 294
+total guesses for draw       : 5700
+threshold was                : 2
+======================
+Number Paths 4 for dataset 1
+100%|████████████████████████| 43789/43789 [24:19<00:00, 30.00it/s]
+total accuracy rate          : 57.36 %
+accuracy for white win       : 60.11 %
+accuracy for black win       : 56.77 %
+accuracy for draw            : 3.73 %
+correct times                : 22633
+total guesses                : 39460
+correct times for white win  : 11590
+total guesses for white win  : 19281
+correct times for white win  : 11014
+total guesses for white win  : 19401
+correct times for draw       : 29
+total guesses for draw       : 778
+threshold was                : 3
+======================
+Number Paths 4 for dataset 2
+100%|████████████████████████| 44111/44111 [23:11<00:00, 31.70it/s]
+total accuracy rate          : 57.39 %
+accuracy for white win       : 59.67 %
+accuracy for black win       : 56.68 %
+accuracy for draw            : 4.41 %
+correct times                : 22548
+total guesses                : 39287
+correct times for white win  : 11528
+total guesses for white win  : 19321
+correct times for white win  : 10995
+total guesses for white win  : 19399
+correct times for draw       : 25
+total guesses for draw       : 567
+threshold was                : 3
+======================
+Number Paths 4 for dataset 3
+100%|████████████████████████| 43011/43011 [26:12<00:00, 27.36it/s]
+total accuracy rate          : 56.78 %
+accuracy for white win       : 58.97 %
+accuracy for black win       : 56.64 %
+accuracy for draw            : 3.77 %
+correct times                : 22256
+total guesses                : 39199
+correct times for white win  : 11304
+total guesses for white win  : 19168
+correct times for white win  : 10924
+total guesses for white win  : 19288
+correct times for draw       : 28
+total guesses for draw       : 743
+threshold was                : 3
+======================
+Iteration 1
+======================
+PageRanks method for dataset 1
+100%|██████████████████████| 43789/43789 [00:28<00:00, 1555.10it/s]
+total accuracy rate          : 11.91 %
+accuracy for white win       : 49.87 %
+accuracy for black win       : 46.84 %
+accuracy for draw            : 3.58 %
+correct times                : 4931
+total guesses                : 41401
+correct times for white win  : 1938
+total guesses for white win  : 3886
+correct times for white win  : 1788
+total guesses for white win  : 3817
+correct times for draw       : 1205
+total guesses for draw       : 33698
+threshold was                : 100
+======================
+PageRanks method for dataset 2
+100%|██████████████████████| 44111/44111 [00:25<00:00, 1738.48it/s]
+total accuracy rate          : 12.53 %
+accuracy for white win       : 50.75 %
+accuracy for black win       : 48.02 %
+accuracy for draw            : 3.47 %
+correct times                : 5154
+total guesses                : 41148
+correct times for white win  : 2094
+total guesses for white win  : 4126
+correct times for white win  : 1913
+total guesses for white win  : 3984
+correct times for draw       : 1147
+total guesses for draw       : 33038
+threshold was                : 100
+======================
+PageRanks method for dataset 3
+100%|██████████████████████| 43011/43011 [00:26<00:00, 1647.03it/s]
+total accuracy rate          : 13.29 %
+accuracy for white win       : 52.63 %
+accuracy for black win       : 48.74 %
+accuracy for draw            : 3.62 %
+correct times                : 5495
+total guesses                : 41353
+correct times for white win  : 2233
+total guesses for white win  : 4243
+correct times for white win  : 2074
+total guesses for white win  : 4255
+correct times for draw       : 1188
+total guesses for draw       : 32855
+threshold was                : 100
+======================
+Iteration 2
+======================
+PageRanks method for dataset 1
+100%|██████████████████████| 43789/43789 [00:27<00:00, 1582.53it/s]
+total accuracy rate          : 12.12 %
+accuracy for white win       : 50.38 %
+accuracy for black win       : 46.82 %
+accuracy for draw            : 3.62 %
+correct times                : 5016
+total guesses                : 41401
+correct times for white win  : 1966
+total guesses for white win  : 3902
+correct times for white win  : 1834
+total guesses for white win  : 3917
+correct times for draw       : 1216
+total guesses for draw       : 33582
+threshold was                : 100
+======================
+PageRanks method for dataset 2
+100%|██████████████████████| 44111/44111 [00:25<00:00, 1743.82it/s]
+total accuracy rate          : 12.27 %
+accuracy for white win       : 50.29 %
+accuracy for black win       : 47.1 %
+accuracy for draw            : 3.61 %
+correct times                : 5050
+total guesses                : 41148
+correct times for white win  : 2025
+total guesses for white win  : 4027
+correct times for white win  : 1826
+total guesses for white win  : 3877
+correct times for draw       : 1199
+total guesses for draw       : 33244
+threshold was                : 100
+======================
+PageRanks method for dataset 3
+100%|██████████████████████| 43011/43011 [00:26<00:00, 1642.13it/s]
+total accuracy rate          : 13.66 %
+accuracy for white win       : 52.32 %
+accuracy for black win       : 49.61 %
+accuracy for draw            : 3.62 %
+correct times                : 5650
+total guesses                : 41353
+correct times for white win  : 2271
+total guesses for white win  : 4341
+correct times for white win  : 2199
+total guesses for white win  : 4433
+correct times for draw       : 1180
+total guesses for draw       : 32579
+threshold was                : 100
+======================
+Iteration 3
+======================
+PageRanks method for dataset 1
+100%|██████████████████████| 43789/43789 [00:27<00:00, 1592.50it/s]
+total accuracy rate          : 12.84 %
+accuracy for white win       : 51.68 %
+accuracy for black win       : 48.94 %
+accuracy for draw            : 3.62 %
+correct times                : 5316
+total guesses                : 41401
+correct times for white win  : 2110
+total guesses for white win  : 4083
+correct times for white win  : 2002
+total guesses for white win  : 4091
+correct times for draw       : 1204
+total guesses for draw       : 33227
+threshold was                : 100
+======================
+PageRanks method for dataset 2
+100%|██████████████████████| 44111/44111 [00:25<00:00, 1748.94it/s]
+total accuracy rate          : 12.5 %
+accuracy for white win       : 50.18 %
+accuracy for black win       : 48.17 %
+accuracy for draw            : 3.54 %
+correct times                : 5145
+total guesses                : 41148
+correct times for white win  : 2043
+total guesses for white win  : 4071
+correct times for white win  : 1932
+total guesses for white win  : 4011
+correct times for draw       : 1170
+total guesses for draw       : 33066
+threshold was                : 100
+======================
+PageRanks method for dataset 3
+100%|██████████████████████| 43011/43011 [00:25<00:00, 1659.91it/s]
+total accuracy rate          : 13.16 %
+accuracy for white win       : 52.43 %
+accuracy for black win       : 49.54 %
+accuracy for draw            : 3.6 %
+correct times                : 5442
+total guesses                : 41353
+correct times for white win  : 2190
+total guesses for white win  : 4177
+correct times for white win  : 2062
+total guesses for white win  : 4162
+correct times for draw       : 1190
+total guesses for draw       : 33014
+threshold was                : 100
+======================
+Iteration 1
+======================
+PageRanks method for dataset 1
+100%|███████████████████████| 43789/43789 [04:21<00:00, 167.30it/s]
+total accuracy rate          : 34.26 %
+accuracy for white win       : 51.5 %
+accuracy for black win       : 48.39 %
+accuracy for draw            : 3.6 %
+correct times                : 14184
+total guesses                : 41401
+correct times for white win  : 7065
+total guesses for white win  : 13718
+correct times for white win  : 6614
+total guesses for white win  : 13667
+correct times for draw       : 505
+total guesses for draw       : 14016
+threshold was                : 1000
+======================
+PageRanks method for dataset 2
+100%|███████████████████████| 44111/44111 [03:59<00:00, 184.04it/s]
+total accuracy rate          : 34.21 %
+accuracy for white win       : 51.26 %
+accuracy for black win       : 48.71 %
+accuracy for draw            : 3.57 %
+correct times                : 14076
+total guesses                : 41148
+correct times for white win  : 6964
+total guesses for white win  : 13585
+correct times for white win  : 6612
+total guesses for white win  : 13574
+correct times for draw       : 500
+total guesses for draw       : 13989
+threshold was                : 1000
+======================
+PageRanks method for dataset 3
+100%|███████████████████████| 43011/43011 [04:07<00:00, 174.01it/s]
+total accuracy rate          : 36.15 %
+accuracy for white win       : 52.24 %
+accuracy for black win       : 50.11 %
+accuracy for draw            : 3.68 %
+correct times                : 14951
+total guesses                : 41353
+correct times for white win  : 7288
+total guesses for white win  : 13950
+correct times for white win  : 7182
+total guesses for white win  : 14333
+correct times for draw       : 481
+total guesses for draw       : 13070
+threshold was                : 1000
+======================
+Iteration 2
+======================
+PageRanks method for dataset 1
+100%|███████████████████████| 43789/43789 [04:21<00:00, 167.33it/s]
+total accuracy rate          : 34.53 %
+accuracy for white win       : 51.94 %
+accuracy for black win       : 48.47 %
+accuracy for draw            : 3.47 %
+correct times                : 14296
+total guesses                : 41401
+correct times for white win  : 7134
+total guesses for white win  : 13735
+correct times for white win  : 6680
+total guesses for white win  : 13781
+correct times for draw       : 482
+total guesses for draw       : 13885
+threshold was                : 1000
+======================
+PageRanks method for dataset 2
+100%|███████████████████████| 44111/44111 [03:59<00:00, 183.92it/s]
+total accuracy rate          : 34.58 %
+accuracy for white win       : 51.81 %
+accuracy for black win       : 48.65 %
+accuracy for draw            : 3.42 %
+correct times                : 14228
+total guesses                : 41148
+correct times for white win  : 7103
+total guesses for white win  : 13711
+correct times for white win  : 6654
+total guesses for white win  : 13676
+correct times for draw       : 471
+total guesses for draw       : 13761
+threshold was                : 1000
+======================
+PageRanks method for dataset 3
+100%|███████████████████████| 43011/43011 [04:08<00:00, 172.79it/s]
+total accuracy rate          : 36.15 %
+accuracy for white win       : 52.38 %
+accuracy for black win       : 49.99 %
+accuracy for draw            : 3.57 %
+correct times                : 14948
+total guesses                : 41353
+correct times for white win  : 7363
+total guesses for white win  : 14057
+correct times for white win  : 7119
+total guesses for white win  : 14240
+correct times for draw       : 466
+total guesses for draw       : 13056
+threshold was                : 1000
+======================
+Iteration 3
+======================
+PageRanks method for dataset 1
+100%|███████████████████████| 43789/43789 [04:19<00:00, 168.56it/s]
+total accuracy rate          : 34.06 %
+accuracy for white win       : 51.49 %
+accuracy for black win       : 48.34 %
+accuracy for draw            : 3.72 %
+correct times                : 14102
+total guesses                : 41401
+correct times for white win  : 7022
+total guesses for white win  : 13637
+correct times for white win  : 6552
+total guesses for white win  : 13554
+correct times for draw       : 528
+total guesses for draw       : 14210
+threshold was                : 1000
+======================
+PageRanks method for dataset 2
+100%|███████████████████████| 44111/44111 [03:58<00:00, 184.75it/s]
+total accuracy rate          : 34.69 %
+accuracy for white win       : 51.6 %
+accuracy for black win       : 49.15 %
+accuracy for draw            : 3.74 %
+correct times                : 14276
+total guesses                : 41148
+correct times for white win  : 7031
+total guesses for white win  : 13625
+correct times for white win  : 6727
+total guesses for white win  : 13686
+correct times for draw       : 518
+total guesses for draw       : 13837
+threshold was                : 1000
+======================
+PageRanks method for dataset 3
+100%|███████████████████████| 43011/43011 [04:04<00:00, 175.89it/s]
+total accuracy rate          : 36.4 %
+accuracy for white win       : 52.41 %
+accuracy for black win       : 49.87 %
+accuracy for draw            : 3.56 %
+correct times                : 15051
+total guesses                : 41353
+correct times for white win  : 7429
+total guesses for white win  : 14176
+correct times for white win  : 7166
+total guesses for white win  : 14370
+correct times for draw       : 456
+total guesses for draw       : 12807
+threshold was                : 1000
