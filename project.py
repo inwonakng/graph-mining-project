@@ -521,7 +521,10 @@ quit()
 
 # This line reads in the pickled data .
 # Parameter determines whether it is from a dataset of approx. 50,000 games or 100,000 games
-# I just left the smaller dataset since that's what I started with, before I realized that it could get bigger
+# I just left the smaller dataset since that's what I started with, 
+# before I realized that it could get bigger
+# If smalldata is set to true, then tests will be faster but it's not huge for methods other than pageranks and fairgoodness
+
 smalldata = False
 g1,mg1,t1,g2,mg2,t2,g3,mg3,t3 = read_prepped_data(smalldata)
 
