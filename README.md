@@ -225,13 +225,10 @@ I suspect this is because 0.9 and 0.1 make a much larger difference when being m
 
 ### Trying to consider the side a player plays from!
 
-#### Number of games read in (used 60% as training data) = 100,000
-|Prediction Method|Dataset 1|Dataset 2|Dataset 3|
-|-|-:|-:|-:|
-|Common Neighbors|56.36%|55.92%|56.23%|
-|Edge Weights|56.8%|56.46%|56.89%|
+For this variation, I tried to only consider games that were played on the side the players are currently about to play at.
+So for the white player, I would only consider games that player has played as white, and vice versa for the black player.
+The common neighbors method was changed to only consider opponents that the player has won against more as the current color as neighbors, and the edge weight method only considers games played in that color when calcuating the win rate.
 
-#### Number of games read in (used 60% as training data) = 200,000
 |Prediction Method|Dataset 1|Dataset 2|Dataset 3|
 |-|-:|-:|-:|
 |Common Neighbors|56.89%|56.37%|56.82%|
@@ -239,6 +236,21 @@ I suspect this is because 0.9 and 0.1 make a much larger difference when being m
 
 Boooo values went down! 
 So seems that which color the player is playing from is not as important as I thought
+
+### Trying to consider a player's preferred/weakness opening moves!
+For this method, I tried to compare a player's winning opening moves with the opening moves that the opponent lost to.
+The data I used for this was the ECO notation of each game, so I had to track which side the player was playing from as well as the opening move used.
+I was actually worried that this would not perform well at all, but surprisingly even with the basic knowledge of chess I have, it actually worked! (not optimal, but not bad still)
+
+These are the values I achieved for each dataset
+
+|Prediction Method|Dataset 1|Dataset 2|Dataset 3|
+|-|-:|-:|-:|
+|Consider Opening Moves|55.23%|54.34%|54.82%|
+
+Not the best values, but still pretty happy this worked at all!
+
+**Note: these were run with draw prediction off, so I was just skipping cases where there was a tie in number of opening moves**
 
 ### Another Change: 
 So far, I have been skipping results where I could have predicted a 'draw'. 
@@ -251,9 +263,12 @@ For this case, I am only using the bigger datasets (aka read in 200,000 games, a
 |Prediction Method|Total accuracy rate|White accuracy rate|Black accuracy rate|Draw accuracy rate|
 |-|-:|-:|-:|-:|
 |Common Neighbors|55.51%|58.43%|54.99%|4.62%|
+|Common Neighbors(*)|55.32%|57.02%|56.71%|3.84%|
 |Edge Weights|58.24%|60.08%|56.55%|7.27%|
+|Edge Weights(*)|57.73%|58.35%|57.12%|4.62%|
 |Number of Paths (3)|45.39%|58.3%|54.42%|4.13%|
 |Number of Paths (4)|55.62%|58.5%|54.96%|4.86%|
+|Opening moves|43.82%|56.47%|53.97%|3.34%|
 |PageRanks #1 (100)|11.93%|50.94%|47.23%|3.56%|
 |PageRanks #2 (100)|11.93%|48.47%|46.59%|3.56%|
 |PageRanks #3 (100)|12.36%|51.71%|47.08%|3.59%|
@@ -265,9 +280,12 @@ For this case, I am only using the bigger datasets (aka read in 200,000 games, a
 |Prediction Method|Total accuracy rate|White accuracy rate|Black accuracy rate|Draw accuracy rate|
 |-|-:|-:|-:|-:|
 |Common Neighbors|55.49%|58.0%|55.26%|4.43%|
+|Common Neighbors(*)|54.82%|56.52%|56.16%|3.93%|
 |Edge Weights|57.73%|59.2%|56.41%|3.92%|
+|Edge Weights(*)|57.48%|57.91%|57.26%|2.86%|
 |Number of Paths (3)|44.01%|56.51%|53.83%|4.23%|
 |Number of Paths (4)|55.29%|57.93%|54.91%|4.62%|
+|Opening moves|43.35%|55.62%|53.02%|3.3%|
 |PageRanks #1 (100)|12.69%|52.15%|47.97%|3.58%|
 |PageRanks #2 (100)|12.26%|49.83%|46.94%|3.51%|
 |PageRanks #3 (100)|12.31%|51.88%|47.87%|3.58%|
@@ -279,9 +297,12 @@ For this case, I am only using the bigger datasets (aka read in 200,000 games, a
 |Prediction Method|Total accuracy rate|White accuracy rate|Black accuracy rate|Draw accuracy rate|
 |-|-:|-:|-:|-:|
 |Common Neighbors|55.31%|57.55%|55.49%|3.47%|
+|Common Neighbors(*)|55.25%|56.63%|57.06%|3.45%|
 |Edge Weights|58.22%|59.52%|57.04%|4.65%|
+|Edge Weights(*)|57.69%|57.87%|57.78%|2%|
 |Number of Paths (3)|44.9%|56.4%|54.4%|5.16%|
 |Number of Paths (4)|55.26%|57.52%|55.4%|3.53%|
+|Opening moves|43.56%|55.97%|53.65%|3.32%|
 |PageRanks #1 (100)|13.13%|51.7%|48.55%|3.67%|
 |PageRanks #2 (100)|13.58%|52.25%|50.12%|3.72%|
 |PageRanks #3 (100)|13.29%|51.78%|50.18%|3.61%|
@@ -292,7 +313,6 @@ For this case, I am only using the bigger datasets (aka read in 200,000 games, a
 **Note: Pagerank performance became attrocious!!**
 
 I did not include the data for fairness/goodness because that algorithm actually does not guess draws for any dataset. I think this is because there are too many factors for the values being compared to be equal, which actually ends up making it the most accurate since draws are rare cases.
-
 
 Since the table is very hard to read, here are the graphs for the accuracy value of each tests.
 Each chart represents the values for one dataset.

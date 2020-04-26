@@ -80,41 +80,51 @@ def create_graph(dataset):
         winner = d['Result']
         w_player = d['White']
         b_player = d['Black']
+        opening = d['ECO']
         # I'm just adding all the rest of the data in to the edge
         # the winner of the game is the source of the edge
         draw = False
         whitewin = False
+        # okay this is kind of stupid, but I'm just going to stick with this because 
+        open_stats = {'ECO':opening,'won_as':''}
         if winner == '1-0': 
             players = (w_player,b_player)
             whitewin = True
+            open_stats['won_as'] = 'white'
         elif winner == '0-1': 
             players = (b_player,w_player)
+            open_stats['won_as'] = 'black'
         else:
             draw = True
             # in case of a draw, we add edges for both direction
             # so that it basically counts as a win from both sides
             p1 = (w_player,b_player)
             p2 = (b_player,w_player)
+            open_stats['won_as'] = 'N/A'
         if not draw:
             if players not in edgelist.keys(): 
-                if whitewin: edgelist[players] = {'weight':1,'whitewin':1,'blackwin':0}
-                else: edgelist[players] = {'weight':1,'whitewin':0,'blackwin':1}
+                if whitewin: edgelist[players] = {'weight':1,'whitewin':1,'blackwin':0,'opening_history':[open_stats]}
+                else: edgelist[players] = {'weight':1,'whitewin':0,'blackwin':1,'opening_history':[open_stats]}
             else:
                 edgelist[players]['weight'] += 1
+                edgelist[players]['opening_history'].append(open_stats)
                 if whitewin: edgelist[players]['whitewin'] += 1
                 else: edgelist[players]['blackwin'] += 1
         else:
-            if p1 not in edgelist.keys(): edgelist[p1] = {'weight':1,'whitewin':.5,'blackwin':.5}
+            if p1 not in edgelist.keys(): edgelist[p1] = {'weight':1,'whitewin':.5,'blackwin':.5,'opening_history':[open_stats]}
             else: 
                 edgelist[p1]['weight'] += 1
                 edgelist[p1]['whitewin'] += .5
                 edgelist[p1]['blackwin'] += .5
-            if p2 not in edgelist.keys(): edgelist[p2] = {'weight':1,'whitewin':.5,'blackwin':.5}
+                edgelist[p1]['opening_history'].append(open_stats)
+            if p2 not in edgelist.keys(): edgelist[p2] = {'weight':1,'whitewin':.5,'blackwin':.5,'opening_history':[open_stats]}
             else: 
                 edgelist[p2]['weight'] += 1
                 edgelist[p2]['whitewin'] += .5
                 edgelist[p2]['blackwin'] += .5
-    edges = [(players[0],players[1],{'weight':values['weight'],'whitewin':values['whitewin'],'blackwin':values['blackwin']}) 
+                edgelist[p2]['opening_history'].append(open_stats)
+    edges = [(players[0],players[1],{'weight':values['weight'],'whitewin':values['whitewin'],
+            'blackwin':values['blackwin'],'opening_history':values['opening_history']})
             for players,values in edgelist.items()]
     G.add_edges_from(edges)
     print("I have",len(list(G.nodes())),'players in this graph')
@@ -174,6 +184,50 @@ def com_neigh_consider_side(white,black,g,threshold):
     if len(wbw|blb) > len(bbb|wlw): return 'white'
     elif len(wbw|blb) < len(bbb|wlw): return 'black'
     else: return 'draw'
+
+def cn_opening_moves(white,black,g,threshold):
+    white_vics = list(g.neighbors(white))
+    white_loss = list(g.predecessors(white))
+    wvic_as_white = set()
+    wvic_as_black = set()
+    wlos_as_white = set()
+    wlos_as_black = set()
+    for p in white_vics:
+        for info in g.get_edge_data(white,p)['opening_history']:
+            if info['won_as'] == 'white': wvic_as_white.add(info['ECO'])
+            else: wvic_as_black.add(info['ECO'])
+    for p in white_loss:
+        for info in g.get_edge_data(p,white)['opening_history']:
+            if info['won_as'] == 'white': wlos_as_white.add(info['ECO'])
+            else: wlos_as_black.add(info['ECO'])
+    black_vics = list(g.neighbors(black))
+    black_loss = list(g.predecessors(black))
+    bvic_as_white = set()
+    bvic_as_black = set()
+    blos_as_white = set()
+    blos_as_black = set()
+    for p in black_vics:
+        for info in g.get_edge_data(black,p)['opening_history']:
+            if info['won_as'] == 'white': bvic_as_white.add(info['ECO'])
+            else: bvic_as_black.add(info['ECO'])
+    for p in black_loss:
+        for info in g.get_edge_data(p,black)['opening_history']:
+            if info['won_as'] == 'white': blos_as_white.add(info['ECO'])
+            else: blos_as_black.add(info['ECO'])
+    # white wins as white, black lose as black
+    ww = len(wvic_as_white&blos_as_black)
+    # white wins as black, black lose as white
+    wb = len(wvic_as_black&blos_as_white)
+    # white lose as white, black wins as black
+    bb = len(wlos_as_white&bvic_as_black)
+    # white lose as black, black wins as white
+    bw = len(wlos_as_black&bvic_as_white)
+
+    if ww+wb > bw+bb: return 'white'
+    elif bw+bb > ww+wb: return 'black'
+    else: return 'draw'
+    
+    # white_lost = 
 
 def number_paths(white,black,g,threshold):
     # this guy is super slow right now!!
@@ -404,19 +458,16 @@ def read_prepped_data(smaller):
     d = open(prefix+'201911_test','rb')
     t1 = pickle.load(d)
     d.close()
-
     g2 = nx.read_gpickle(prefix+'201912_graph')
     mg2 = nx.read_gpickle(prefix+'201912_mgraph')
     d = open(prefix+'201912_test','rb')
     t2 = pickle.load(d)
     d.close()
-
     g3 = nx.read_gpickle(prefix+'202001_graph')
     mg3 = nx.read_gpickle(prefix+'202001_mgraph')
     d = open(prefix+'202001_test','rb')
     t3 = pickle.load(d)
     d.close()
-
     return g1,mg1,t1,g2,mg2,t2,g3,mg3,t3
 
 # function to change directed graph to directed multidigraph
@@ -431,7 +482,6 @@ def dgraph_to_mgraph(oldG):
             new_edges.append((ee[0],ee[1]))
     G.add_edges_from(new_edges)
     return G
-    
 
 #================================== DRIVER CODE ==================================#
 
@@ -446,7 +496,10 @@ datapaths = ['201911.pgn',
 for path in datapaths:
     print('working with dataset:',path)
     prefix = path.split('.')[0]
-    dataset = read_data(path,200000)
+    # dataset = read_data(path,200000)
+    d = open('data_200000/'+prefix+'_raw','rb')
+    dataset = pickle.load(d)
+    d.close()
     base,test = sort_data(dataset,0.6)
     g = create_graph(base)
     mg = dgraph_to_mgraph(g)
@@ -481,8 +534,8 @@ g1,mg1,t1,g2,mg2,t2,g3,mg3,t3 = read_prepped_data(smalldata)
 
 '''The only part that matters for running the prediction:'''
 # simulate(t1,mg1,500,pagerank_easy)
-what_to_print   = 'Common Neighbors method'
-test_type       = common_neighbors
+what_to_print   = 'opening moves with draw on'
+test_type       = cn_opening_moves
 thres           = 1
 
 print('======================')
@@ -502,102 +555,4 @@ if test_type == fairgoodness: fg = calculate_fairgoodness(mg3,thres)
 print(what_to_print,'for dataset 3')
 stored_pagerank = {}
 simulate(t3,g3,thres,test_type)
-
-
-what_to_print   = 'Edge weights method'
-test_type       = edge_weights
-thres           = 1
-
-print('======================')
-if test_type == fairgoodness: fg = calculate_fairgoodness(mg1,thres)
-print(what_to_print,'for dataset 1')
-stored_pagerank = {}
-simulate(t1,g1,thres,test_type)
-
-
-print('======================')
-if test_type == fairgoodness: fg = calculate_fairgoodness(mg2,thres)
-print(what_to_print,'for dataset 2')
-stored_pagerank = {}
-simulate(t2,g2,thres,test_type)
-
-
-print('======================')
-if test_type == fairgoodness: fg = calculate_fairgoodness(mg3,thres)
-print(what_to_print,'for dataset 3')
-stored_pagerank = {}
-simulate(t3,g3,thres,test_type)
-
-
-what_to_print   = 'Path Length Method'
-test_type       = number_paths
-thres           = 2
-
-print('======================')
-if test_type == fairgoodness: fg = calculate_fairgoodness(mg1,thres)
-print(what_to_print,'for dataset 1')
-stored_pagerank = {}
-simulate(t1,g1,thres,test_type)
-
-
-print('======================')
-if test_type == fairgoodness: fg = calculate_fairgoodness(mg2,thres)
-print(what_to_print,'for dataset 2')
-stored_pagerank = {}
-simulate(t2,g2,thres,test_type)
-
-
-print('======================')
-if test_type == fairgoodness: fg = calculate_fairgoodness(mg3,thres)
-print(what_to_print,'for dataset 3')
-stored_pagerank = {}
-simulate(t3,g3,thres,test_type)
-
-what_to_print   = 'Path Length method'
-test_type       = common_neighbors
-thres           = 3
-
-print('======================')
-if test_type == fairgoodness: fg = calculate_fairgoodness(mg1,thres)
-print(what_to_print,'for dataset 1')
-stored_pagerank = {}
-simulate(t1,g1,thres,test_type)
-
-
-print('======================')
-if test_type == fairgoodness: fg = calculate_fairgoodness(mg2,thres)
-print(what_to_print,'for dataset 2')
-stored_pagerank = {}
-simulate(t2,g2,thres,test_type)
-
-
-print('======================')
-if test_type == fairgoodness: fg = calculate_fairgoodness(mg3,thres)
-print(what_to_print,'for dataset 3')
-stored_pagerank = {}
-simulate(t3,g3,thres,test_type)
-
-
-what_to_print   = 'Fair/Goodness'
-test_type       = fairgoodness
-thres           = 100
-
-print('======================')
-if test_type == fairgoodness: fg = calculate_fairgoodness(mg1,thres)
-print(what_to_print,'for dataset 1')
-stored_pagerank = {}
-simulate(t1,g1,thres,test_type)
-
-
-print('======================')
-if test_type == fairgoodness: fg = calculate_fairgoodness(mg2,thres)
-print(what_to_print,'for dataset 2')
-stored_pagerank = {}
-simulate(t2,g2,thres,test_type)
-
-
-print('======================')
-if test_type == fairgoodness: fg = calculate_fairgoodness(mg3,thres)
-print(what_to_print,'for dataset 3')
-stored_pagerank = {}
-simulate(t3,g3,thres,test_type)
+# '''
