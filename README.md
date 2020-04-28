@@ -50,7 +50,7 @@ And of course, seems that increasing the number of training data (although the n
 |Path Length threshold|Dataset 1|Dataset 2|Dataset 3|
 |:-:|-|-|-|
 |3|56.36%|55.17%|55.39%|
-|4|58.44%|58.17%|%|
+|4|58.44%|58.17%|57.8%|
 
 **Even at threshold of length 4, each run took over 10 minutes, so it's pretty inefficient, compared to other methods**
 
